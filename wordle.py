@@ -18,13 +18,22 @@ Possible_letters = set()
 DNE_letters = set()
 
 def done(feedback):
+
+      # feedback is initially empty so just return False
+      if feedback == []:
+            return False
+
       for item in feedback:
             if item != 'correct':
                   return False
       return True
 
-def guess(feedback, previous_guess):
+def create_guess(feedback, previous_guess):
       
+      # initially there is no feedback or previous guess
+      if feedback == [] and previous_guess == "":
+            return "salet"
+
       # find letters that are not in word
       index = 0
       for item in feedback:
@@ -86,30 +95,21 @@ def guess(feedback, previous_guess):
 driver = webdriver.Chrome()
 driver.get("https://www.nytimes.com/games/wordle/index.html")
 #driver.get("https://wordle.berknation.com/")
-
-guess_number = 1
-first_guess = "salet"
-previous_guess = first_guess
-
 webdriver.ActionChains(driver).click().perform()
-webdriver.ActionChains(driver).send_keys(first_guess + Keys.ENTER).perform()
 
-row = driver.execute_script("return document.querySelector('game-app').shadowRoot.querySelector('game-row').shadowRoot.querySelectorAll('game-tile')")
+guess_number = 0
+previous_guess = ""
 feedback = []
-for tile in row:
-      feedback.append(tile.get_attribute("evaluation"))
-      print(tile.get_attribute("evaluation"))
-
-
 
 while not done(feedback) and guess_number < 6:
-      time.sleep(2)
+      if guess_number != 0:
+            time.sleep(2)
 
       guess_number = guess_number + 1
-      word = guess(feedback, previous_guess)
-      previous_guess = word
+      guess = create_guess(feedback, previous_guess)
+      previous_guess = guess
 
-      webdriver.ActionChains(driver).send_keys(word + Keys.ENTER).perform()
+      webdriver.ActionChains(driver).send_keys(guess + Keys.ENTER).perform()
 
       row = driver.execute_script(f"return document.querySelector('game-app').shadowRoot.querySelector('game-row:nth-child({guess_number})').shadowRoot.querySelectorAll('game-tile')")
       feedback = []
