@@ -38,7 +38,6 @@ def create_guess(feedback, previous_guess):
             print(f"Initial guess is: {word}")
             return word
 
-      # find letters that are not in word
       index = 0
       for item in feedback:
             if item == "correct":
