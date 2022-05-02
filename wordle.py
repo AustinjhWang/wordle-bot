@@ -32,7 +32,11 @@ def create_guess(feedback, previous_guess):
       
       # initially there is no feedback or previous guess
       if feedback == [] and previous_guess == "":
-            return "salet"
+            word = input("Enter a guess or press enter for default: ")
+            if word == "":
+                  word = "salet"
+            print(f"Initial guess is: {word}")
+            return word
 
       # find letters that are not in word
       index = 0
@@ -81,16 +85,16 @@ def create_guess(feedback, previous_guess):
             words_list.remove(word)
       
       #feedback
-      print("correct")
+      print("Correct Letters")
       print(Correct_letters)
-      print("possible")
+      print("Possible Letters")
       print(Possible_letters)
-      print("not possible")
+      print("Not Possible Letters")
       print(DNE_letters)
-      print("number of possible words left: " + str(len(words_list))) 
+      print("Number of possible words left: " + str(len(words_list))) 
 
       word = random.choice(words_list)
-      print(f"new guess: {word}")
+      print(f"New guess: {word}")
       return word
 
 driver = webdriver.Chrome()
@@ -118,6 +122,7 @@ while not done(feedback) and guess_number < 6:
             feedback.append(tile.get_attribute("evaluation"))
             print(tile.get_attribute("evaluation"))
 
+# wait for results to show and click share button
 time.sleep(5)
 share_button = driver.execute_script("return document.querySelector('game-app').shadowRoot.querySelector('game-stats').shadowRoot.querySelector('button')")
 webdriver.ActionChains(driver).click(share_button).perform()
