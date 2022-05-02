@@ -90,6 +90,7 @@ def create_guess(feedback, previous_guess):
       print("number of possible words left: " + str(len(words_list))) 
 
       word = random.choice(words_list)
+      print(f"new guess: {word}")
       return word
 
 driver = webdriver.Chrome()
@@ -117,3 +118,6 @@ while not done(feedback) and guess_number < 6:
             feedback.append(tile.get_attribute("evaluation"))
             print(tile.get_attribute("evaluation"))
 
+time.sleep(5)
+share_button = driver.execute_script("return document.querySelector('game-app').shadowRoot.querySelector('game-stats').shadowRoot.querySelector('button')")
+webdriver.ActionChains(driver).click(share_button).perform()
