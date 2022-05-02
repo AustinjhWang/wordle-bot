@@ -96,32 +96,40 @@ def create_guess(feedback, previous_guess):
       print(f"New guess: {word}")
       return word
 
-driver = webdriver.Chrome()
-driver.get("https://www.nytimes.com/games/wordle/index.html")
-#driver.get("https://wordle.berknation.com/")
-webdriver.ActionChains(driver).click().perform()
+def run(share):
+      driver = webdriver.Chrome()
+      driver.get("https://www.nytimes.com/games/wordle/index.html")
+      #driver.get("https://wordle.berknation.com/")
+      webdriver.ActionChains(driver).click().perform()
 
-guess_number = 0
-previous_guess = ""
-feedback = []
-
-while not done(feedback) and guess_number < 6:
-      if guess_number != 0:
-            time.sleep(2)
-
-      guess_number = guess_number + 1
-      guess = create_guess(feedback, previous_guess)
-      previous_guess = guess
-
-      webdriver.ActionChains(driver).send_keys(guess + Keys.ENTER).perform()
-
-      row = driver.execute_script(f"return document.querySelector('game-app').shadowRoot.querySelector('game-row:nth-child({guess_number})').shadowRoot.querySelectorAll('game-tile')")
+      guess_number = 0
+      previous_guess = ""
       feedback = []
-      for tile in row:
-            feedback.append(tile.get_attribute("evaluation"))
-            print(tile.get_attribute("evaluation"))
 
-# wait for results to show and click share button
-time.sleep(5)
-share_button = driver.execute_script("return document.querySelector('game-app').shadowRoot.querySelector('game-stats').shadowRoot.querySelector('button')")
-webdriver.ActionChains(driver).click(share_button).perform()
+      while not done(feedback) and guess_number < 6:
+            if guess_number != 0:
+                  time.sleep(2)
+
+            guess_number = guess_number + 1
+            guess = create_guess(feedback, previous_guess)
+            previous_guess = guess
+
+            webdriver.ActionChains(driver).send_keys(guess + Keys.ENTER).perform()
+
+            row = driver.execute_script(f"return document.querySelector('game-app').shadowRoot.querySelector('game-row:nth-child({guess_number})').shadowRoot.querySelectorAll('game-tile')")
+            feedback = []
+            for tile in row:
+                  feedback.append(tile.get_attribute("evaluation"))
+                  print(tile.get_attribute("evaluation"))
+
+      # wait for results to show and click share button
+      if share == True:
+            time.sleep(5)
+            share_button = driver.execute_script("return document.querySelector('game-app').shadowRoot.querySelector('game-stats').shadowRoot.querySelector('button')")
+            webdriver.ActionChains(driver).click(share_button).perform()
+            
+      driver.quit()
+      return guess_number
+
+if __name__ == "__main__":
+      run(True)
