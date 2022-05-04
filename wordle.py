@@ -12,10 +12,12 @@ words_string = words_file.read() # a string
 words_list = words_string.split("\n") # returns list
 words_file.close()
 
-# keep track of correct letters (green), possible letters (yellow), and letters that do not exist (grey)
-Correct_letters = []
+# keep track of correct letters (green), possible letters (yellow), letters that do not exist (grey),
+# and letters that are already correct elsewhere (grey with a green of same letter)
+Correct_letters = set()
 Possible_letters = set()
 DNE_letters = set()
+Grey_correct_letters = set()
 
 def done(feedback):
 
@@ -41,13 +43,12 @@ def create_guess(feedback, previous_guess):
       index = 0
       for item in feedback:
             if item == "correct":
-                  Correct_letters.append((previous_guess[index], index))
+                  Correct_letters.add((previous_guess[index], index))
             elif item == "present":
                   Possible_letters.add((previous_guess[index], index))
             index = index + 1
       
       # check for absent after adding correct letters to avoid grey green
-      # only add to DNE if letter is not already in correct/possible letters
       index = 0
       for item in feedback:
             if item == "absent":
@@ -57,8 +58,17 @@ def create_guess(feedback, previous_guess):
                   correct_letters_list = [element for tuple in Correct_letters for element in tuple]
                   possible_letters_list = [element for tuple in Possible_letters for element in tuple]
 
-                  if letter not in correct_letters_list and letter not in possible_letters_list:
-                        DNE_letters.add(letter)
+                  # yellow/grey case
+                  if letter in possible_letters_list:
+                        Possible_letters.add((letter, index))
+
+                  # green/grey, grey/green case
+                  elif letter in correct_letters_list:
+                        Grey_correct_letters.add(letter)
+
+                  # only add to DNE if letter is not already in correct/possible letters
+                  elif letter not in correct_letters_list and letter not in possible_letters_list:
+                        DNE_letters.add(letter)               
 
             index = index + 1
       
@@ -80,6 +90,14 @@ def create_guess(feedback, previous_guess):
                   if word[index] == letter:
                         remove_set.add(word)
 
+            for letter in Grey_correct_letters:
+                  # if word contains letter, it has to be in position index
+                  if letter in word:
+                        indicies = [i for i, char in enumerate(word) if char == letter]
+                        index = word.index(letter)
+                        if indicies != [index]:
+                              remove_set.add(word)
+
       for word in remove_set:
             words_list.remove(word)
       
@@ -90,6 +108,8 @@ def create_guess(feedback, previous_guess):
       print(Possible_letters)
       print("Not Possible Letters")
       print(DNE_letters)
+      print("Grey Correct Letters")
+      print(Grey_correct_letters)
       print("Number of possible words left: " + str(len(words_list))) 
 
       word = random.choice(words_list)
