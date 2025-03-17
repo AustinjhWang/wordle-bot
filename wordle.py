@@ -119,33 +119,44 @@ def create_guess(feedback, previous_guess):
 def run(share):
       driver = webdriver.Chrome()
       driver.get("https://www.nytimes.com/games/wordle/index.html")
-      #driver.get("https://wordle.berknation.com/")
       webdriver.ActionChains(driver).click().perform()
+      
+      # get through to the game screen
+      continue_button = driver.execute_script("return document.querySelector('.purr-blocker-card__button')")
+      webdriver.ActionChains(driver).click(continue_button).perform()
+      button_board = driver.execute_script("return document.querySelector('div[class=Welcome-module_buttonContainer__K4GEw]')")
+      buttons = button_board.find_elements(By.CLASS_NAME, "Welcome-module_button__ZG0Zh.Welcome-module_gameSaleStyle__duVA4")
+      play_button = buttons[3]
+      webdriver.ActionChains(driver).click(play_button).perform()
+      time.sleep(1)
+      webdriver.ActionChains(driver).send_keys(Keys.ENTER).perform()
 
       guess_number = 0
       previous_guess = ""
       feedback = []
 
       while not done(feedback) and guess_number < 6:
-            if guess_number != 0:
-                  time.sleep(2)
-
             guess_number = guess_number + 1
             guess = create_guess(feedback, previous_guess)
             previous_guess = guess
 
             webdriver.ActionChains(driver).send_keys(guess + Keys.ENTER).perform()
 
-            row = driver.execute_script(f"return document.querySelector('game-app').shadowRoot.querySelector('game-row:nth-child({guess_number})').shadowRoot.querySelectorAll('game-tile')")
+            time.sleep(3)
+            row = driver.execute_script(f"return document.querySelector('div[aria-label=\"Row {guess_number}\"]')")
+            tiles = row.find_elements(By.CLASS_NAME, "Tile-module_tile__UWEHN")
             feedback = []
-            for tile in row:
-                  feedback.append(tile.get_attribute("evaluation"))
-                  print(tile.get_attribute("evaluation"))
+            for tile in tiles:
+                  print(tile.text + " " + tile.get_dom_attribute("data-state"))
+                  feedback.append(tile.get_dom_attribute("data-state"))
 
       # wait for results to show and click share button
       if share == True:
-            time.sleep(5)
-            share_button = driver.execute_script("return document.querySelector('game-app').shadowRoot.querySelector('game-stats').shadowRoot.querySelector('button')")
+            time.sleep(3)
+            cancel_button = driver.execute_script("return document.querySelector('.Modal-module_closeIconButton__y9b6c')")
+            webdriver.ActionChains(driver).click(cancel_button).perform()
+            time.sleep(1)
+            share_button = driver.execute_script("return document.querySelector('.Footer-module_shareButton__cHprS')")
             webdriver.ActionChains(driver).click(share_button).perform()
             
       driver.quit()
