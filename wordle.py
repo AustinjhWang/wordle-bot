@@ -125,7 +125,7 @@ def run(share):
       continue_button = driver.execute_script("return document.querySelector('.purr-blocker-card__button')")
       webdriver.ActionChains(driver).click(continue_button).perform()
       button_board = driver.execute_script("return document.querySelector('div[class=Welcome-module_buttonContainer__K4GEw]')")
-      buttons = button_board.find_elements(By.CLASS_NAME, "Welcome-module_button__ZG0Zh.Welcome-module_gameSaleStyle__duVA4")
+      buttons = button_board.find_elements(By.CLASS_NAME, "Welcome-module_button__ZG0Zh")
       play_button = buttons[3]
       webdriver.ActionChains(driver).click(play_button).perform()
       time.sleep(1)
